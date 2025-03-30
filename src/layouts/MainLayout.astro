@@ -1,0 +1,257 @@
+---
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { ClientRouter } from "astro:transitions";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title = "Portal - 资源导航", description = "一站式资源导航平台" } =
+  Astro.props;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <ClientRouter />
+    <title>{title}</title>
+    <!-- 主题初始化脚本，放在头部最前面 -->
+    <script is:inline>
+      // 获取用户偏好的主题，如果没有则默认为亮色主题
+      (function () {
+        const getThemePreference = () => {
+          const savedTheme = localStorage.getItem("theme-preference");
+          return savedTheme || "light"; // 默认亮色主题
+        };
+
+        // 立即设置主题，避免闪烁
+        const theme = getThemePreference();
+        document.documentElement.className = theme;
+        console.log(`初始化主题: ${theme}`);
+      })();
+    </script>
+  </head>
+  <body>
+    <div class="site-wrapper">
+      <Header />
+
+      <main class="site-main">
+        <slot />
+      </main>
+
+      <Footer />
+    </div>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    /* 颜色系统 - 亮色主题默认值 */
+    --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+      Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+      sans-serif;
+  }
+
+  /* 亮色主题变量 */
+  .light {
+    --color-bg-primary: #f8f9fa;
+    --color-bg-secondary: #ffffff;
+    --color-text: #111827;
+    --color-text-secondary: #4b5563;
+    --color-surface-100: #e5e7eb;
+    --color-surface-200: #d1d5db;
+    --color-border: #e2e8f0;
+    --color-accent-primary: #5e72eb;
+    --color-accent-secondary: #ff77e1;
+    --hero-gradient: linear-gradient(160deg, #f8f9fa 0%, #e5e7eb 100%);
+    --card-bg: rgba(255, 255, 255, 1);
+    --card-border: rgba(0, 0, 0, 0.1);
+    --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    --header-bg: rgba(255, 255, 255, 0.9);
+    --footer-bg: #f1f5f9;
+  }
+
+  /* 暗色主题变量 */
+  .dark {
+    --color-bg-primary: #090909;
+    --color-bg-secondary: #111827;
+    --color-text: #f8f9fa;
+    --color-text-secondary: rgba(255, 255, 255, 0.7);
+    --color-surface-100: rgba(255, 255, 255, 0.05);
+    --color-surface-200: rgba(255, 255, 255, 0.1);
+    --color-border: rgba(255, 255, 255, 0.1);
+    --color-accent-primary: #5e72eb;
+    --color-accent-secondary: #ff77e1;
+    --hero-gradient: radial-gradient(
+      circle at top center,
+      #1a1a2e 0%,
+      #090909 70%
+    );
+    --card-bg: rgba(30, 30, 40, 0.8);
+    --card-border: rgba(255, 255, 255, 0.1);
+    --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    --header-bg: rgba(10, 10, 15, 0.8);
+    --footer-bg: rgba(10, 10, 15, 0.8);
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+  }
+
+  html {
+    font-family: var(--font-sans);
+    scroll-behavior: smooth;
+  }
+
+  body {
+    min-height: 100vh;
+    overflow-x: hidden;
+    color: var(--color-text);
+    background-color: var(--color-bg-primary);
+  }
+
+  /* View Transitions 相关样式 */
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 0.5s;
+  }
+
+  /* 卡片过渡效果 */
+  .card {
+    view-transition-name: var(--card-transition-name, none);
+    contain: layout;
+  }
+
+  /* 标题过渡效果 */
+  .page-title::view-transition-old,
+  .page-title::view-transition-new {
+    animation-duration: 0.5s;
+  }
+
+  .card-title::view-transition-old,
+  .card-title::view-transition-new {
+    animation-duration: 0.5s;
+  }
+
+  /* 响应式动画设置 */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::after,
+    ::before {
+      transition: none !important;
+      animation: none !important;
+    }
+
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+      animation: none !important;
+    }
+  }
+
+  .site-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  .site-main {
+    flex: 1;
+    background: var(--hero-gradient);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--color-text);
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .gradient-text {
+    background: linear-gradient(
+      to right,
+      var(--color-accent-primary),
+      var(--color-accent-secondary)
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* 标题动画效果 */
+  .title-animated {
+    animation: title-pulse 0.6s ease-out;
+  }
+
+  @keyframes title-pulse {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+</style>
+
+<script>
+  // 为卡片添加过渡效果
+  document.addEventListener("astro:page-load", () => {
+    const cards = document.querySelectorAll(".card");
+    cards.forEach((card, index) => {
+      // 获取卡片的data-index属性或使用index作为备用
+      const cardIndex =
+        (card as HTMLElement).dataset.index || `global-${index}`;
+      // 类型断言为HTMLElement
+      (card as HTMLElement).style.setProperty(
+        "--card-transition-name",
+        `card-${cardIndex}`
+      );
+    });
+
+    // 添加动画完成事件监听
+    document.addEventListener("astro:transition-animation", (e) => {
+      // 对于页面之间的标题切换，可以添加一些额外效果
+      const pageTitle = document.querySelector(".page-title");
+      if (pageTitle) {
+        pageTitle.classList.add("title-animated");
+
+        // 动画结束后移除类名
+        setTimeout(() => {
+          pageTitle.classList.remove("title-animated");
+        }, 600);
+      }
+    });
+  });
+
+  // 处理主题在页面过渡时的保持
+  document.addEventListener("astro:after-swap", () => {
+    // 恢复主题
+    const theme = localStorage.getItem("theme-preference") || "light";
+    document.documentElement.className = theme;
+  });
+</script>

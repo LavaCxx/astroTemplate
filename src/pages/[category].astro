@@ -1,0 +1,233 @@
+---
+import MainLayout from "../layouts/MainLayout.astro";
+import CardGrid from "../components/CardGrid.astro";
+import linksData from "../data/links.json";
+import type { LinksData, LinkItem } from "../types";
+
+// 获取动态路由参数
+export function getStaticPaths() {
+  // 使用类型断言
+  const typedLinksData = linksData as LinksData[];
+
+  // 找出所有内部类型的链接，用来生成动态路由
+  const paths: {
+    params: { category: string };
+    props: { pageData: LinkItem };
+  }[] = [];
+
+  typedLinksData.forEach((category) => {
+    category.items.forEach((item) => {
+      if (item.type === "internal" && item.subItems) {
+        // 从URL中提取路径部分
+        const path = item.url.split("/").pop();
+        if (path) {
+          paths.push({
+            params: { category: path },
+            props: { pageData: item },
+          });
+        }
+      }
+    });
+  });
+
+  return paths;
+}
+
+// 获取传递的props
+const { pageData } = Astro.props;
+
+// 获取URL中的id参数，用于设置标题过渡效果
+const urlParams = new URL(Astro.request.url).searchParams;
+const selectedId = urlParams.get("id");
+---
+
+<MainLayout title={`${pageData.title} - Portal`}>
+  <section class="section-header">
+    <div class="container">
+      <h1
+        class="page-title"
+        data-astro-transition-name={selectedId
+          ? `title-${selectedId}`
+          : undefined}
+      >
+        {pageData.title}
+      </h1>
+      <p class="page-description">{pageData.description}</p>
+    </div>
+  </section>
+
+  <div class="sub-page-content">
+    <div class="card-grid">
+      {
+        pageData.subItems?.map((item: LinkItem) => {
+          const isFile = item.type === "file";
+          const isExternal = item.type === "external";
+          const fileExt = isFile
+            ? item.url.split(".").pop()?.toLowerCase()
+            : null;
+
+          return (
+            <a
+              href={item.url}
+              class="card"
+              target={isExternal || isFile ? "_blank" : "_self"}
+              rel={isExternal || isFile ? "noopener noreferrer" : ""}
+              data-file-type={fileExt}
+              data-item-id={item.id}
+            >
+              <div class="card-content">
+                <h3 class="card-title" transition:name="title">
+                  {item.title}
+                </h3>
+                <p class="card-description">{item.description}</p>
+
+                <div class="card-indicator">
+                  {isFile && <span class="file-badge">{fileExt}</span>}
+                  {isExternal && (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="external-icon"
+                    >
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                      <polyline points="15 3 21 3 21 9" />
+                      <line x1="10" y1="14" x2="21" y2="3" />
+                    </svg>
+                  )}
+                </div>
+              </div>
+            </a>
+          );
+        })
+      }
+    </div>
+  </div>
+</MainLayout>
+
+<style>
+  .section-header {
+    padding: 4rem 0 2rem;
+    text-align: center;
+  }
+
+  .container {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  .page-title {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    background: linear-gradient(
+      to right,
+      var(--color-accent-primary),
+      var(--color-accent-secondary)
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+    transition: font-size 0.3s ease;
+  }
+
+  .page-description {
+    font-size: 1.1rem;
+    color: var(--color-text-secondary);
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  .sub-page-content {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 1rem;
+  }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--card-shadow);
+  }
+
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  .card-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card-title {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+    color: var(--color-text);
+  }
+
+  .card-description {
+    font-size: 0.95rem;
+    color: var(--color-text-secondary);
+    margin-bottom: 1rem;
+    flex-grow: 1;
+  }
+
+  .card-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-top: auto;
+  }
+
+  .file-badge {
+    background: var(--color-surface-100);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+  }
+
+  .external-icon {
+    color: var(--color-text-secondary);
+  }
+
+  @media (max-width: 768px) {
+    .section-header {
+      padding: 3rem 0 1.5rem;
+    }
+
+    .page-title {
+      font-size: 2.2rem;
+    }
+
+    .page-description {
+      font-size: 1rem;
+    }
+
+    .card-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

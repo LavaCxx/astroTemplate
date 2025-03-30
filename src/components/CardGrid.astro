@@ -1,0 +1,552 @@
+---
+import type { LinksData } from "../types";
+
+interface Props {
+  data: LinksData[];
+  showFavorites?: boolean;
+}
+
+const { data, showFavorites = false } = Astro.props;
+
+// 这部分代码会在客户端执行
+---
+
+<div class="card-grid-container">
+  <!-- 添加收藏区域，只在showFavorites为true时显示 -->
+  {showFavorites && (
+    <div class="category-section favorites-section" id="category-favorites" style="display: none;">
+      <h2 class="category-title">我的收藏</h2>
+      <div class="card-grid" id="favorites-grid">
+        <!-- 收藏的卡片将由JS动态添加到这里 -->
+      </div>
+    </div>
+  )}
+
+  {
+    data.map((category, categoryIndex) => (
+      <div class="category-section" id={`category-${categoryIndex}`}>
+        <h2 class="category-title">{category.category}</h2>
+        <div class="card-grid">
+          {category.items.map((item) => {
+            const isFile = item.type === "file";
+            const isExternal = item.type === "external";
+            const fileExt = isFile
+              ? item.url.split(".").pop()?.toLowerCase()
+              : null;
+
+            return (
+              <a
+                href={item.type === "internal" ? `/${item.url.replace(/^\//, '')}?id=${item.id}` : item.url}
+                class="card"
+                target={isExternal || isFile ? "_blank" : "_self"}
+                rel={isExternal || isFile ? "noopener noreferrer" : ""}
+                data-file-type={fileExt}
+                data-item-id={item.id}
+              >
+                <div class="card-content">
+                  <h3 class="card-title">{item.title}</h3>
+                  <p class="card-description">{item.description}</p>
+
+                  <div class="card-indicator">
+                    {isFile && <span class="file-badge">{fileExt}</span>}
+                    {isExternal && (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="external-icon"
+                      >
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                        <polyline points="15 3 21 3 21 9" />
+                        <line x1="10" y1="14" x2="21" y2="3" />
+                      </svg>
+                    )}
+                    {!isFile && !isExternal && (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="internal-icon"
+                      >
+                        <path d="M5 12h14" />
+                        <path d="M12 5l7 7-7 7" />
+                      </svg>
+                    )}
+                    <!-- 添加收藏按钮 -->
+                    <button class="favorite-btn" data-id={item.id} aria-label="收藏">
+                      <svg 
+                        class="star-icon" 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        width="16" 
+                        height="16" 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        stroke-width="2" 
+                        stroke-linecap="round" 
+                        stroke-linejoin="round"
+                      >
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .card-grid-container {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 1.2rem 0.8rem;
+  }
+
+  .category-section {
+    margin-bottom: 2.5rem;
+  }
+  
+  .favorites-section {
+    margin-bottom: 2rem;
+    border-radius: 12px;
+    padding: 1.2rem;
+    background: linear-gradient(to right, rgba(94, 114, 235, 0.1), rgba(255, 119, 225, 0.1));
+    border: 1px solid var(--color-border);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .favorites-section::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(
+      to right,
+      var(--color-accent-primary),
+      var(--color-accent-secondary)
+    );
+  }
+  
+  .favorites-section .category-title {
+    margin-bottom: 0.8rem;
+  }
+  
+  .favorites-section .card {
+    border-color: rgba(94, 114, 235, 0.3);
+    background: var(--card-bg);
+    position: relative;
+    padding: 0.8rem;
+  }
+  
+  .favorites-section .card .card-title {
+    margin-bottom: 0;
+  }
+  
+  .favorites-section .card .card-indicator {
+    margin-top: 0.6rem;
+  }
+  
+  .favorites-section .card::after {
+    content: "★";
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 30px;
+    height: 30px;
+    background: linear-gradient(
+      to right,
+      var(--color-accent-primary),
+      var(--color-accent-secondary)
+    );
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  }
+  
+  .favorites-section .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px -8px rgba(94, 114, 235, 0.2);
+    border-color: rgba(94, 114, 235, 0.5);
+    transition: all 0.3s ease;
+  }
+
+  .category-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--color-text);
+    position: relative;
+    display: inline-block;
+  }
+
+  .category-title::after {
+    content: "";
+    position: absolute;
+    bottom: -0.35rem;
+    left: 0;
+    width: 2.5rem;
+    height: 0.2rem;
+    background: linear-gradient(
+      to right,
+      var(--color-accent-primary),
+      var(--color-accent-secondary)
+    );
+    border-radius: 4px;
+  }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 0.8rem;
+  }
+
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 1rem;
+    transition: all 0.25s ease;
+    text-decoration: none;
+    color: inherit;
+    height: 100%;
+    display: block;
+    box-shadow: var(--card-shadow);
+    position: relative;
+  }
+
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.2);
+    border-color: var(--color-accent-primary);
+  }
+
+  :global(.light-theme) .card {
+    background: var(--card-bg);
+    color: var(--color-text);
+  }
+
+  :global(.dark-theme) .card {
+    background: var(--card-bg);
+    color: var(--color-text);
+  }
+
+  .card-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+  }
+
+  .card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 0.4rem;
+    color: var(--color-text);
+  }
+
+  .card-description {
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+    margin: 0;
+    flex-grow: 1;
+  }
+
+  .card-indicator {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .file-badge {
+    background: rgba(94, 114, 235, 0.2);
+    color: var(--color-accent-primary);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .external-icon,
+  .internal-icon {
+    color: var(--color-text-secondary);
+  }
+  
+  .favorite-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    padding: 4px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    z-index: 5;
+  }
+
+  .favorite-btn:hover {
+    background-color: rgba(94, 114, 235, 0.1);
+    color: var(--color-accent-primary);
+    transform: scale(1.1);
+  }
+  
+  .favorite-btn.active .star-icon {
+    fill: var(--color-accent-primary);
+    color: var(--color-accent-primary);
+  }
+  
+  /* 为已收藏的卡片添加标记 */
+  .card:has(.favorite-btn.active)::after {
+    content: "★";
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 24px;
+    height: 24px;
+    background: linear-gradient(
+      to right,
+      var(--color-accent-primary),
+      var(--color-accent-secondary)
+    );
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 12px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* 确保收藏区域中的卡片不显示重复标记 */
+  .favorites-section .card:has(.favorite-btn.active)::after {
+    display: none;
+  }
+
+  .favorites-section .card-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
+  
+  .favorites-section .card {
+    border-color: rgba(94, 114, 235, 0.3);
+    background: var(--card-bg);
+    position: relative;
+    padding: 0.8rem;
+  }
+  
+  .favorites-section .card .card-title {
+    margin-bottom: 0;
+  }
+  
+  .favorites-section .card .card-indicator {
+    margin-top: 0.6rem;
+  }
+
+  @media (max-width: 768px) {
+    .card-grid {
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    }
+    
+    .favorites-section .card-grid {
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    }
+    
+    .card {
+      padding: 0.8rem;
+    }
+    
+    .card-title {
+      font-size: 0.95rem;
+    }
+    
+    .card-description {
+      font-size: 0.8rem;
+    }
+    
+    .category-title {
+      font-size: 1.3rem;
+    }
+  }
+</style>
+
+<script define:vars={{ showFavorites }}>
+  // 在页面加载时初始化收藏功能
+  document.addEventListener('DOMContentLoaded', () => {
+    initFavorites();
+  });
+
+  // 初始化收藏功能
+  function initFavorites() {
+    // 从localStorage获取收藏列表
+    const favorites = getFavorites();
+    // 为所有收藏按钮添加点击事件
+    setupFavoriteButtons(favorites);
+    // 显示收藏区域（如果有收藏项且允许显示收藏区域）
+    if (showFavorites) {
+      updateFavoritesSection(favorites);
+    }
+    // 标记已收藏的项目
+    markFavoriteItems(favorites);
+  }
+
+  // 获取收藏列表
+  function getFavorites() {
+    const favoritesStr = localStorage.getItem('favorites');
+    return favoritesStr ? JSON.parse(favoritesStr) : [];
+  }
+
+  // 设置收藏按钮点击事件
+  function setupFavoriteButtons(favorites) {
+    const btns = document.querySelectorAll('.favorite-btn');
+    
+    btns.forEach(btn => {
+      const itemId = btn.getAttribute('data-id');
+      
+      // 先移除所有现有的点击事件监听器
+      const newBtn = btn.cloneNode(true);
+      if (btn.parentNode) {
+        btn.parentNode.replaceChild(newBtn, btn);
+      }
+      
+      // 如果已收藏，添加active类
+      if (itemId && favorites.includes(itemId)) {
+        newBtn.classList.add('active');
+      } else {
+        newBtn.classList.remove('active');
+      }
+      
+      // 阻止点击按钮时导航到链接
+      newBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (!itemId) return;
+        
+        const currentFavorites = getFavorites(); // 获取最新的收藏列表
+        const isFavorited = currentFavorites.includes(itemId);
+        
+        if (isFavorited) {
+          // 取消收藏
+          const newFavorites = currentFavorites.filter(id => id !== itemId);
+          localStorage.setItem('favorites', JSON.stringify(newFavorites));
+          newBtn.classList.remove('active');
+          if (showFavorites) {
+            updateFavoritesSection(newFavorites);
+          }
+        } else {
+          // 添加收藏
+          currentFavorites.push(itemId);
+          localStorage.setItem('favorites', JSON.stringify(currentFavorites));
+          newBtn.classList.add('active');
+          if (showFavorites) {
+            updateFavoritesSection(currentFavorites);
+          }
+        }
+      });
+    });
+  }
+
+  // 更新收藏区域
+  function updateFavoritesSection(favorites) {
+    // 如果不显示收藏区域则直接返回
+    if (!showFavorites) return;
+    
+    const favoritesSection = document.getElementById('category-favorites');
+    const favoritesGrid = document.getElementById('favorites-grid');
+    
+    // 验证DOM元素存在
+    if (!favoritesSection || !favoritesGrid) return;
+    
+    // 清空收藏区域
+    favoritesGrid.innerHTML = '';
+    
+    if (favorites.length === 0) {
+      // 如果没有收藏项，隐藏收藏区域
+      favoritesSection.style.display = 'none';
+      return;
+    }
+    
+    // 显示收藏区域
+    favoritesSection.style.display = 'block';
+    
+    // 遍历所有卡片，找到收藏的卡片并复制到收藏区域
+    favorites.forEach(favoriteId => {
+      const originalCard = document.querySelector(`a.card[data-item-id="${favoriteId}"]`);
+      if (originalCard) {
+        const clonedCard = originalCard.cloneNode(true);
+        
+        // 添加收藏卡片特殊类名
+        clonedCard.classList.add('favorite-card');
+        
+        // 隐藏描述文本
+        const description = clonedCard.querySelector('.card-description');
+        if (description) {
+          description.style.display = 'none';
+        }
+        
+        // 为收藏区域的收藏按钮设置点击事件
+        const favoriteBtn = clonedCard.querySelector('.favorite-btn');
+        if (favoriteBtn) {
+          favoriteBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // 从收藏中移除
+            const newFavorites = favorites.filter(id => id !== favoriteId);
+            localStorage.setItem('favorites', JSON.stringify(newFavorites));
+            
+            // 更新所有相关按钮状态
+            document.querySelectorAll(`.favorite-btn[data-id="${favoriteId}"]`).forEach(btn => {
+              btn.classList.remove('active');
+            });
+            
+            // 更新收藏区域
+            updateFavoritesSection(newFavorites);
+            
+            // 重新设置原始卡片的收藏按钮事件，解决取消收藏后无法再次收藏的问题
+            setupFavoriteButtons(newFavorites);
+          });
+        }
+        
+        // 添加到收藏区域
+        favoritesGrid.appendChild(clonedCard);
+      }
+    });
+  }
+
+  // 标记已收藏的项目
+  function markFavoriteItems(favorites) {
+    favorites.forEach(id => {
+      document.querySelectorAll(`.favorite-btn[data-id="${id}"]`).forEach(btn => {
+        btn.classList.add('active');
+      });
+    });
+  }
+</script>

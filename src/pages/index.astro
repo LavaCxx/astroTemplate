@@ -1,11 +1,78 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import MainLayout from "../layouts/MainLayout.astro";
+import CardGrid from "../components/CardGrid.astro";
+import linksData from "../data/links.json";
+import type { LinksData } from "../types";
 
 // Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
 // Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+
+// 使用类型断言
+const typedLinksData = linksData as LinksData[];
 ---
 
-<Layout>
-	<Welcome />
-</Layout>
+<MainLayout>
+  <section class="hero">
+    <div class="container">
+      <h1 class="hero-title">
+        <span class="gradient-text">Portal</span> 资源导航
+      </h1>
+      <p class="hero-description">为您精心收集的优质资源导航中心</p>
+    </div>
+  </section>
+
+  <CardGrid data={typedLinksData} showFavorites={true} />
+</MainLayout>
+
+<style>
+  .hero {
+    padding: 4rem 0 2rem;
+    text-align: center;
+  }
+
+  .container {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  .hero-title {
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+    line-height: 1.1;
+    color: var(--color-text);
+  }
+
+  .gradient-text {
+    background: linear-gradient(
+      to right,
+      var(--color-accent-primary),
+      var(--color-accent-secondary)
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .hero-description {
+    font-size: 1.25rem;
+    color: var(--color-text-secondary);
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 768px) {
+    .hero {
+      padding: 3rem 0 1.5rem;
+    }
+
+    .hero-title {
+      font-size: 2.2rem;
+    }
+
+    .hero-description {
+      font-size: 1rem;
+    }
+  }
+</style>

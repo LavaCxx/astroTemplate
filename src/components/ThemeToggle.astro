@@ -1,0 +1,211 @@
+<button id="theme-toggle" aria-label="切换主题">
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    class="icon-sun"
+  >
+    <circle cx="12" cy="12" r="5"></circle>
+    <line x1="12" y1="1" x2="12" y2="3"></line>
+    <line x1="12" y1="21" x2="12" y2="23"></line>
+    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+    <line x1="1" y1="12" x2="3" y2="12"></line>
+    <line x1="21" y1="12" x2="23" y2="12"></line>
+    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+  </svg>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    class="icon-moon"
+  >
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+  </svg>
+</button>
+
+<style>
+  #theme-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text);
+    background-color: var(--color-surface-100);
+    transition: all 0.2s ease;
+  }
+
+  #theme-toggle:hover {
+    background-color: var(--color-surface-200);
+  }
+
+  .icon-sun,
+  .icon-moon {
+    position: absolute;
+    transition:
+      opacity 0.2s ease,
+      transform 0.3s ease;
+  }
+
+  :global(.light) .icon-sun {
+    opacity: 1;
+    transform: rotate(0);
+  }
+
+  :global(.light) .icon-moon {
+    opacity: 0;
+    transform: rotate(-90deg);
+  }
+
+  :global(.dark) .icon-sun {
+    opacity: 0;
+    transform: rotate(90deg);
+  }
+
+  :global(.dark) .icon-moon {
+    opacity: 1;
+    transform: rotate(0);
+  }
+</style>
+
+<script>
+  // 检查浏览器是否支持View Transitions API
+  const isViewTransitionsSupported = document.startViewTransition !== undefined;
+
+  // 主题切换逻辑
+  let isTransitioning = false; // 添加状态标志
+
+  const toggleTheme = async (event: MouseEvent | Event) => {
+    // 如果已经在转换中，则退出
+    if (isTransitioning) return;
+    isTransitioning = true;
+
+    const isDark = document.documentElement.classList.contains("dark");
+    const newTheme = isDark ? "light" : "dark";
+
+    // 获取点击位置，或者回退到页面中间
+    const x =
+      event instanceof MouseEvent ? event.clientX : window.innerWidth / 2;
+    const y =
+      event instanceof MouseEvent ? event.clientY : window.innerHeight / 2;
+
+    // 获取到最远角的距离
+    const endRadius = Math.hypot(
+      Math.max(x, window.innerWidth - x),
+      Math.max(y, window.innerHeight - y)
+    );
+
+    if (isViewTransitionsSupported) {
+      try {
+        // 直接设置class属性，这很重要
+        const transition = document.startViewTransition(() => {
+          document.documentElement.className = newTheme;
+
+          // 保存主题偏好到localStorage
+          localStorage.setItem("theme-preference", newTheme);
+        });
+
+        const circlePath = [
+          `circle(${endRadius}px at ${x}px ${y}px)`,
+          `circle(0 at ${x}px ${y}px)`,
+        ];
+
+        const clipPath = isDark ? circlePath : [...circlePath].reverse();
+
+        // 监听过渡动画的就绪状态
+        transition.ready.then(() => {
+          // 设置动画效果，确保两个方向都有动画
+          document.documentElement.animate(
+            {
+              clipPath,
+            },
+            {
+              duration: 400,
+              easing: "ease-out",
+              pseudoElement: isDark
+                ? "::view-transition-old(root)"
+                : "::view-transition-new(root)",
+            }
+          );
+        });
+
+        await transition.finished;
+        console.log(`主题已切换为 ${newTheme}`);
+      } catch (error) {
+        console.error("View Transitions API error:", error);
+        // 降级方案
+        document.documentElement.className = newTheme;
+        localStorage.setItem("theme-preference", newTheme);
+      } finally {
+        // 无论成功还是失败，重置状态
+        isTransitioning = false;
+      }
+    } else {
+      // 不支持View Transitions API的浏览器降级处理
+      document.documentElement.className = newTheme;
+      localStorage.setItem("theme-preference", newTheme);
+      isTransitioning = false;
+    }
+  };
+
+  // 添加防抖功能
+  function debounce(fn: Function, delay: number) {
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    return function (...args: any[]) {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => fn(...args), delay);
+    };
+  }
+
+  // 添加点击事件监听器
+  document.addEventListener("DOMContentLoaded", () => {
+    const themeToggle = document.getElementById("theme-toggle");
+    if (themeToggle) {
+      // 使用防抖减少快速点击
+      themeToggle.addEventListener("click", toggleTheme);
+    }
+  });
+</script>
+
+<style is:global>
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+    cursor: progress;
+  }
+
+  .dark::view-transition-old(root) {
+    z-index: 1;
+  }
+
+  .dark::view-transition-new(root) {
+    z-index: 999;
+  }
+
+  ::view-transition-old(root) {
+    z-index: 999;
+  }
+
+  ::view-transition-new(root) {
+    z-index: 1;
+  }
+</style>
