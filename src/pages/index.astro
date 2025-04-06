@@ -1,11 +1,35 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header/index.astro";
+import Footer from "../components/Footer/index.astro";
+import CardGrid from "../components/CardGrid";
+import Favorites from "../components/Favorites";
+import siteData from "../data/json/siteData.json";
+import type { SiteConfig } from "../types/index";
 
 // Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
 // Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+
+const typedSiteData = siteData as SiteConfig;
 ---
 
 <Layout>
-	<Welcome />
+  <Header />
+  <main class="container">
+    <Favorites client:load />
+    <CardGrid
+      title={typedSiteData.title}
+      description={typedSiteData.description}
+      categories={typedSiteData.categories}
+      client:load
+    />
+  </main>
+  <Footer />
 </Layout>
+
+<style>
+  main {
+    padding: 2rem 0;
+    flex: 1;
+  }
+</style>

@@ -1,0 +1,33 @@
+/* 主题切换的全局样式 */
+
+/* 亮色主题下的太阳和月亮图标样式 */
+.light .sun {
+  fill: var(--text-color);
+}
+
+.light .moon {
+  fill: transparent;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* 视图过渡的层级控制 */
+.dark::view-transition-old(root) {
+  z-index: 1;
+}
+
+.dark::view-transition-new(root) {
+  z-index: 999;
+}
+
+::view-transition-old(root) {
+  z-index: 999;
+}
+
+::view-transition-new(root) {
+  z-index: 1;
+}

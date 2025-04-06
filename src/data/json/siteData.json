@@ -1,0 +1,74 @@
+{
+  "title": "资源中心",
+  "description": "浏览所有可用的资源和工具",
+  "categories": [
+    {
+      "id": "internal-tools",
+      "name": "内部工具",
+      "cards": [
+        {
+          "id": "dashboard",
+          "title": "控制面板",
+          "description": "查看和管理所有项目的状态",
+          "tags": [{ "id": "tool", "name": "工具", "color": "#4f46e5" }],
+          "link": "/dashboard",
+          "iconType": "internal",
+          "subCards": [
+            {
+              "id": "analytics",
+              "title": "数据分析",
+              "description": "查看详细的项目数据分析",
+              "tags": [{ "id": "data", "name": "数据", "color": "#2563eb" }],
+              "link": "/dashboard/analytics",
+              "iconType": "internal"
+            },
+            {
+              "id": "reports",
+              "title": "报告生成器",
+              "description": "创建和导出项目报告",
+              "tags": [{ "id": "reports", "name": "报告", "color": "#059669" }],
+              "link": "/dashboard/reports",
+              "iconType": "internal"
+            }
+          ]
+        },
+        {
+          "id": "calendar",
+          "title": "日历",
+          "description": "查看和管理所有项目的时间表",
+          "tags": [
+            { "id": "tool", "name": "工具", "color": "#4f46e5" },
+            { "id": "planning", "name": "计划", "color": "#d97706" }
+          ],
+          "link": "/calendar",
+          "iconType": "internal"
+        }
+      ]
+    },
+    {
+      "id": "external-resources",
+      "name": "外部资源",
+      "cards": [
+        {
+          "id": "docs",
+          "title": "文档",
+          "description": "查看产品文档和使用指南",
+          "tags": [{ "id": "resource", "name": "资源", "color": "#be123c" }],
+          "link": "https://example.com/docs",
+          "iconType": "external"
+        },
+        {
+          "id": "api",
+          "title": "API 文档",
+          "description": "了解如何集成我们的API",
+          "tags": [
+            { "id": "dev", "name": "开发", "color": "#475569" },
+            { "id": "api", "name": "API", "color": "#0891b2" }
+          ],
+          "link": "https://example.com/api",
+          "iconType": "external"
+        }
+      ]
+    }
+  ]
+} 

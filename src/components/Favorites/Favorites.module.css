@@ -1,0 +1,203 @@
+.favorites {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  background-color: rgba(var(--accent-rgb), 0.05);
+  border: 1px solid rgba(var(--accent-rgb), 0.2);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 3px 15px -8px rgba(var(--accent-rgb), 0.3);
+  transition: box-shadow 0.3s ease, max-height 0.3s ease;
+}
+
+.favorites::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    var(--accent-color),
+    rgba(var(--accent-rgb), 0.6)
+  );
+}
+
+/* 收藏栏的特殊星标装饰 */
+.favorites::after {
+  content: "★";
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  font-size: 4rem;
+  color: rgba(var(--accent-rgb), 0.05);
+  z-index: 0;
+  transform: rotate(10deg);
+}
+
+.favoritesHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  position: relative;
+  z-index: 1;
+}
+
+.favoritesHeaderLeft {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.favoritesTitle {
+  font-size: 1.25rem;
+  margin: 0;
+  color: var(--accent-color);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.starIcon {
+  color: var(--accent-color);
+  font-size: 1.1rem;
+}
+
+.favoritesDescription {
+  color: var(--text-color-secondary);
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.favoritesCount {
+  background-color: rgba(var(--accent-rgb), 0.2);
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--accent-color);
+}
+
+.expandButton {
+  background: none;
+  border: none;
+  color: var(--accent-color);
+  cursor: pointer;
+  padding: 0 0.3rem;
+  margin-left: 0.5rem;
+  font-size: 1rem;
+  line-height: 1;
+  opacity: 0.7;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.expandButton:hover {
+  opacity: 1;
+  transform: translateY(-2px);
+}
+
+/* 水平滚动卡片容器 */
+.favoritesContent {
+  position: relative;
+  z-index: 1;
+  max-height: 100px;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.expanded .favoritesContent {
+  max-height: 400px;
+}
+
+.cardsScroll {
+  display: flex;
+  gap: 0.8rem;
+  padding-bottom: 0.5rem;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--accent-rgb), 0.3) transparent;
+}
+
+.cardsScroll::-webkit-scrollbar {
+  height: 4px;
+}
+
+.cardsScroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.cardsScroll::-webkit-scrollbar-thumb {
+  background-color: rgba(var(--accent-rgb), 0.3);
+  border-radius: 20px;
+}
+
+/* 收藏卡片样式 */
+.favCard {
+  min-width: 220px;
+  max-width: 280px;
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  text-decoration: none;
+  color: var(--text-color);
+  transition: transform 0.2s, box-shadow 0.2s;
+  flex-shrink: 0;
+}
+
+.favCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px -6px rgba(0, 0, 0, 0.15);
+  text-decoration: none;
+}
+
+.favCardContent {
+  padding: 0.6rem 0.75rem;
+}
+
+.favCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.favCardTitle {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-color);
+  flex: 1;
+  /* 单行文本溢出省略 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+}
+
+.favCardTag {
+  flex-shrink: 0;
+  display: inline-block;
+  padding: 0.15rem 0.4rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  white-space: nowrap;
+  background-color: #f1f5f9;
+  color: #64748b;
+}
+
+@media (max-width: 768px) {
+  .favorites {
+    padding: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .favorites::after {
+    display: none;
+  }
+}

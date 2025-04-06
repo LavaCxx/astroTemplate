@@ -1,0 +1,76 @@
+.themeToggle {
+  border: 0;
+  background: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background-color: var(--hover-bg);
+  /* transition: all 0.2s ease; */
+}
+
+.themeToggle:hover {
+  background-color: var(--hover-bg-darker);
+}
+
+/* 新的图标样式 */
+.iconSun,
+.iconMoon {
+  position: absolute;
+  color: var(--text-color);
+  /* transition: opacity 0.2s ease, transform 0.3s ease; */
+}
+
+/* 默认状态 - 假设默认为light */
+.iconSun {
+  opacity: 1;
+  transform: rotate(0);
+}
+
+.iconMoon {
+  opacity: 0;
+  transform: rotate(-90deg);
+}
+
+/* 全局样式 */
+:global(.light) .iconSun {
+  opacity: 1;
+  transform: rotate(0);
+}
+
+:global(.light) .iconMoon {
+  opacity: 0;
+  transform: rotate(-90deg);
+}
+
+:global(.dark) .iconSun {
+  opacity: 0;
+  transform: rotate(90deg);
+}
+
+:global(.dark) .iconMoon {
+  opacity: 1;
+  transform: rotate(0);
+}
+
+/* 视图过渡样式 */
+:global(.dark)::view-transition-old(root) {
+  z-index: 1;
+}
+
+:global(.dark)::view-transition-new(root) {
+  z-index: 999;
+}
+
+:global(::view-transition-old(root)) {
+  z-index: 999;
+}
+
+:global(::view-transition-new(root)) {
+  z-index: 1;
+}

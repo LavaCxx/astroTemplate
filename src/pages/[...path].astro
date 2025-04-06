@@ -1,0 +1,53 @@
+---
+import siteData from "../data/json/siteData.json";
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header/index.astro";
+import Footer from "../components/Footer/index.astro";
+import CardGrid from "../components/CardGrid";
+import Favorites from "../components/Favorites";
+import type { Card, SiteConfig } from "../types/index";
+
+export async function getStaticPaths() {
+  // 定义正确的类型，包含params和props
+  const paths: { params: { path: string }; props: { card: Card } }[] = [];
+  const typedSiteData = siteData as SiteConfig;
+
+  // 为每个带有子卡片的卡片生成路径
+  typedSiteData.categories.forEach((category) => {
+    category.cards.forEach((card) => {
+      if (card.subCards && card.subCards.length > 0) {
+        const path = card.link.startsWith("/") ? card.link.slice(1) : card.link;
+        paths.push({
+          params: { path },
+          props: { card },
+        });
+      }
+    });
+  });
+
+  return paths;
+}
+
+const { card } = Astro.props as { card: Card };
+---
+
+<Layout title={card.title} description={card.description}>
+  <Header />
+  <main class="container">
+    <Favorites client:load />
+    <CardGrid
+      title={card.title}
+      description={card.description}
+      cards={card.subCards}
+      client:load
+    />
+  </main>
+  <Footer />
+</Layout>
+
+<style>
+  main {
+    padding: 2rem 0;
+    flex: 1;
+  }
+</style>

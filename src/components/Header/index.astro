@@ -1,0 +1,61 @@
+---
+import ThemeToggle from "../ThemeToggle/index.tsx";
+import siteData from "../../data/json/siteData.json";
+import type { SiteConfig } from "../../types/index";
+
+const typedSiteData = siteData as SiteConfig;
+---
+
+<header class="header">
+  <div class="container">
+    <div class="header-content">
+      <div class="logo">
+        <a href="/">{typedSiteData.title}</a>
+      </div>
+      <nav class="nav">
+        <ThemeToggle client:load />
+      </nav>
+    </div>
+  </div>
+</header>
+
+<style>
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background-color: var(--header-bg);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 0;
+  }
+
+  .header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 2.5rem;
+  }
+
+  .logo {
+    font-weight: 700;
+    font-size: 1.25rem;
+  }
+
+  .logo a {
+    color: var(--text-color);
+    text-decoration: none;
+  }
+
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  @media (max-width: 768px) {
+    .header-content {
+      height: auto;
+    }
+  }
+</style>

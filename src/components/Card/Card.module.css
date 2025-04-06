@@ -1,0 +1,126 @@
+.card {
+  display: block;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  text-decoration: none;
+  color: var(--text-color);
+  height: 100%;
+  transition: transform var(--transition-normal),
+    box-shadow var(--transition-normal), border-color var(--transition-normal);
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px -10px rgba(0, 0, 0, 0.2);
+  border-color: var(--accent-color);
+  text-decoration: none;
+}
+
+.cardContent {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-color);
+}
+
+.favoriteButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  color: var(--text-color-secondary);
+  transition: color var(--transition-normal), transform var(--transition-normal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0.5rem;
+}
+
+.favoriteButton:hover {
+  color: #f59e0b;
+  transform: scale(1.1);
+}
+
+.favoriteIcon {
+  transition: fill var(--transition-normal);
+}
+
+.favoriteButton:hover .favoriteIcon {
+  color: #f59e0b;
+}
+
+.description {
+  font-size: 0.875rem;
+  color: var(--text-color-secondary);
+  margin: 0 0 1.5rem 0;
+  flex-grow: 1;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  width: 100%;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  max-width: 80%;
+}
+
+.tag {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+  background-color: #f1f5f9;
+  color: #64748b;
+}
+
+.icon {
+  color: var(--text-color-secondary);
+  flex-shrink: 0;
+}
+
+.iconExternal,
+.iconInternal {
+  transition: transform var(--transition-normal);
+}
+
+.card:hover .iconExternal,
+.card:hover .iconInternal {
+  color: var(--accent-color);
+  transform: translateX(2px);
+}
+
+@media (max-width: 640px) {
+  .cardContent {
+    padding: 1.25rem;
+  }
+
+  .title {
+    font-size: 1.125rem;
+  }
+}
